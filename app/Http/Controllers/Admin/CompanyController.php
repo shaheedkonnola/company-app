@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Models\Company;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
-use App\Models\Company;
 
 class CompanyController extends Controller
 {
@@ -13,7 +14,9 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        //
+        $companies = Company::paginate(24);
+
+        return response()->view('company.index');
     }
 
     /**
@@ -21,7 +24,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        //
+       return response()->view('company.create');
     }
 
     /**
@@ -29,7 +32,7 @@ class CompanyController extends Controller
      */
     public function store(StoreCompanyRequest $request)
     {
-        //
+        Company::create(array_merge($request->validate(),['created_by' => auth()->user()->id, 'updated_by' =>  auth()->user()->id]));
     }
 
     /**
@@ -37,7 +40,7 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        //
+        return response()->view('company.show',compact($company));
     }
 
     /**
@@ -45,7 +48,7 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
-        //
+        return response()->view('company.edit',compact($company));
     }
 
     /**
@@ -53,7 +56,9 @@ class CompanyController extends Controller
      */
     public function update(UpdateCompanyRequest $request, Company $company)
     {
-        //
+        $company->update(array_merge($request->validate(),['updated_by' =>  auth()->user()->id]));
+
+        return response()->view('company.index');
     }
 
     /**
@@ -61,6 +66,9 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
-        //
+        $company->delete();
+
+        return response()->view('company.index');
     }
+    
 }

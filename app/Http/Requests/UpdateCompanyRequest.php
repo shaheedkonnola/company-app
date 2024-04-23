@@ -22,7 +22,11 @@ class UpdateCompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required','min:3','string'],
+            'description' => ['required','string'] ,
+            'logo_path' => ['image', 'required'],
+            'phone' => ['required','integer','min:10', 'maX:10'],
+            'annual_turn_over' =>  ['required','numeric']
         ];
     }
 }
