@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Company;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CompanyResource;
+use App\Http\Resources\CompanyCollection;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 
@@ -14,17 +16,9 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $companies = Company::paginate(24);
+        $companies = Company::query()->with('createdBy','updatedBy');
 
-        return response()->view('company.index');
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-       return response()->view('company.create');
+        return response()->json(new CompanyCollection($companies->paginate(24)));
     }
 
     /**
@@ -32,43 +26,56 @@ class CompanyController extends Controller
      */
     public function store(StoreCompanyRequest $request)
     {
-        Company::create(array_merge($request->validate(),['created_by' => auth()->user()->id, 'updated_by' =>  auth()->user()->id]));
+        $company = Company::create($request->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Company Created Successfully!',
+            'data' => new CompanyResource($company)
+        ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Company $company)
+    public function show(String $id)
     {
-        return response()->view('company.show',compact($company));
-    }
+        $company = Company::with('createdBy','updatedBy','employees')->find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Company $company)
-    {
-        return response()->view('company.edit',compact($company));
+        return response()->json([
+            'success' => true,
+            'message' => 'Company Details',
+            'data' => new CompanyResource($company)
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCompanyRequest $request, Company $company)
+    public function update(UpdateCompanyRequest $request, String $id)
     {
-        $company->update(array_merge($request->validate(),['updated_by' =>  auth()->user()->id]));
+        $company = Company::find($id);
+        $company->update($request->validated());
 
-        return response()->view('company.index');
+        return response()->json([
+            'success' => true,
+            'message' => 'Company Details Updated Successfully!',
+            'data' => new CompanyResource($company)
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Company $company)
+    public function destroy(String $id)
     {
+        $company = Company::find($id);
         $company->delete();
-
-        return response()->view('company.index');
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Company Deleted Successfully!',
+        ]);
     }
     
 }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->decimal('annual_turn_over',11,0)->nullable();
             $table->integer('created_by')->constrained()->on('users');
-            $table->integer('updaated_by')->constrained()->on('users');
+            $table->integer('updated_by')->constrained()->on('users');
             $table->timestamps();
         });
     }

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('image_path', 2048)->nullable();
             $table->date('join_date')->nullable();
             $table->integer('created_by')->constrained()->on('users');
-            $table->integer('updaated_by')->constrained()->on('users');
+            $table->integer('updated_by')->constrained()->on('users');
             $table->timestamps();
         });
     }
